@@ -1,7 +1,9 @@
 import requests
+import pandas as pd
 from argparse import ArgumentParser
 
 from util.config import load_config
+from data.data_module import DataModule
 
 
 def main():
@@ -27,37 +29,43 @@ def main():
     
     args = parser.parse_args()
 
-    payload = {
-        "model": args.model,
-        "prompt": "Say hello and confirm that the model is running.",
-        "stream": args.stream,
-        "logprobs": args.log_probs,
-        "options": {
-            "seed": args.seed,
-            "temperature": args.temperature,
-            "num_predict": args.num_predict
-        }
-    }
-    response = requests.post(
-        "http://localhost:11434/api/generate",
-        json=payload,
-        timeout=120
-    )
-    response.raise_for_status()
+    # payload = {
+    #     "model": args.model,
+    #     "prompt": "Say hello and confirm which model are you.",
+    #     "stream": args.stream,
+    #     "logprobs": args.log_probs,
+    #     "options": {
+    #         "seed": args.seed,
+    #         "temperature": args.temperature,
+    #         "num_predict": args.num_predict
+    #     }
+    # }
+    # response = requests.post(
+    #     "http://localhost:11434/api/generate",
+    #     json=payload,
+    #     timeout=120
+    # )
+    # response.raise_for_status()
 
-    data = response.json()
-    # print(json.dumps(data, indent=2, ensure_ascii=False))
-    print("RESPONSE:", repr(data.get("response", "")))
+    # data = response.json()
+    # # print(json.dumps(data, indent=2, ensure_ascii=False))
+    # print("RESPONSE:", repr(data.get("response", "")))
 
-    # Stop the model after the test
-    requests.post(
-        "http://localhost:11434/api/generate",
-        json={
-            "model": args.model,
-            "keep_alive": 0
-        },
-        timeout=30
-    ).raise_for_status()
+    # # Stop the model after the test
+    # requests.post(
+    #     "http://localhost:11434/api/generate",
+    #     json={
+    #         "model": args.model,
+    #         "keep_alive": 0
+    #     },
+    #     timeout=30
+    # ).raise_for_status()
+
+    compl_gate_istr = cf["financial_sentiment"]["compliance_gate_instruction"]
+    sentiment_istr = cf["financial_sentiment"]["sentiment_instruction"]
+
+    dm = DataModule("../ollama_config.yaml", "financial_sentiment")
+    
 
 
 if __name__ == "__main__":

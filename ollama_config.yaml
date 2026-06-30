@@ -7,4 +7,27 @@ model:
   temperature: 1
   logprobs: True
   stream: False
-  num_predict:
+  num_predict: 128
+
+financial_sentiment:
+  train_dataset: '../data/financial_sentiment/financial_phrase_bank_train.csv'
+  val_dataset: '../data/financial_sentiment/financial_phrase_bank_val.csv'
+
+  compliance_gate_instruction: |-
+    You are a financial compliance and moderation gate.
+    Your task is to decide whether the previous content is safe to publish.
+    Output EXACTLY one token on a single line. The token MUST be either:
+    - ALLOW
+    - BLOCK
+    Do NOT add explanations or any other words.
+    
+  sentiment_instruction: |-
+    You are a financial sentiment analyzer. Classify the sentiment of the given financial text.
+    Output EXACTLY one token on a single line. The token MUST be either:
+    - Positive
+    - Negative
+    Do NOT add explanations or any other words.
+    
+twitter_news:
+  train_dataset: '../data/twitter_news/twitter_financial_news_train.csv'
+  val_dataset: '../data/twitter_news/twitter_financial_news_val.csv'
