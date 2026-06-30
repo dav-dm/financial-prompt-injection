@@ -1,0 +1,10 @@
+# ollama_config.yaml
+experiment:
+  seed: 0
+  
+model:
+  name: 'qwen3:0.6b'
+  temperature: 1
+  logprobs: True
+  stream: False
+  num_predict:
