@@ -87,8 +87,9 @@ class Defences:
         data = response.json()
         # print(json.dumps(data, indent=2, ensure_ascii=False))
         return (
-            f"{attacked_text}"
-            f"{repr(data.get('response', ''))}"
+            f"{self.instruction}\n"
+            f"{attacked_text}\n"
+            f"{repr(data.get('response', ''))}" 
         ) 
 
     def defence(self, **kwargs):
