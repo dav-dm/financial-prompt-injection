@@ -269,5 +269,7 @@ pyrightconfig.json
 # User data
 *.csv
 *.json
+TwitterFinancialNews.ipynb
+FinancialSentimentAnalysis.ipynb
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,windows,macos,linux
