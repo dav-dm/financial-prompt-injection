@@ -34,3 +34,27 @@ financial_sentiment:
 twitter_news:
   train_dataset: '../data/twitter_news/twitter_financial_news_train.csv'
   val_dataset: '../data/twitter_news/twitter_financial_news_val.csv'
+
+  twitter_classification_instruction: |-
+    You are a financial news topic classifier. Classify the topic of the given financial tweet.
+    Output EXACTLY one number (0-9) corresponding to ONE of the following topics:
+    0 : Fed | Central Banks
+    1 : Company | Product News
+    2 : Earnings
+    3 : Energy | Oil
+    4 : Financials
+    5 : General News | Opinion
+    6 : Macro
+    7 : Politics
+    8 : Stock Commentary
+    9 : Stock Movement
+    Do NOT add explanations or any other words.
+
+  compliance_gate_instruction: |-
+    You are a financial compliance and moderation gate.
+    Your task is to decide whether the previous content is safe to publish.
+    Output EXACTLY one token on a single line. The token MUST be either:
+    - ALLOW
+    - BLOCK
+    Do NOT add explanations or any other words.
+
