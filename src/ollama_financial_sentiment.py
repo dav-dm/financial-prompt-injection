@@ -65,11 +65,12 @@ def main():
         attacked_text = attack.inject(target_text=target_text)
         print(attacked_text)
         input()
-        final_prompt = defence.defence(attacked_text=attacked_text)
+        final_prompt = defence.defend(attacked_text=attacked_text, clean_text=target_text)
         print(final_prompt)
         input()
         response = model.invoke(final_prompt)
         print(response)
+        # evaluator.evaluate(response=response, label=label, final_prompt=final_prompt)
         break
     # Stop the model after the test
     model.stop()

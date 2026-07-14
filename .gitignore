@@ -269,6 +269,7 @@ pyrightconfig.json
 # User data
 *.csv
 *.json
+.results/
 TwitterFinancialNews.ipynb
 FinancialSentimentAnalysis.ipynb
 

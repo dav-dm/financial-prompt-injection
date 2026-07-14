@@ -12,28 +12,53 @@ class OllamaModel:
 
 
     def invoke(self, prompt):
-        payload = {
-            "model": self.model_name,
-            "prompt": prompt,
-            "stream": self.stream,
-            "logprobs": self.log_probs,
-            "options": {
-                "seed": self.seed,
-                "temperature": self.temperature,
-                "num_predict": self.num_predict
+        if isinstance(prompt, str):
+            payload = {
+                "model": self.model_name,
+                "prompt": prompt,
+                "stream": self.stream,
+                "logprobs": self.log_probs,
+                "options": {
+                    "seed": self.seed,
+                    "temperature": self.temperature,
+                    "num_predict": self.num_predict
+                }
             }
-        }
-        req = requests.post(
-            "http://localhost:11434/api/generate",
-            json=payload,
-            timeout=120
-        )
-        req.raise_for_status()
+            req = requests.post(
+                "http://localhost:11434/api/generate",
+                json=payload,
+                timeout=120
+            )
+            req.raise_for_status()
 
-        data = req.json()
-        response = repr(data.get("response", ""))
-        return response
-    
+            data = req.json()
+            return data.get("response", "")
+        
+        elif isinstance(prompt, list):
+            payload = {
+                "model": self.model_name,
+                "messages": prompt,
+                "stream": self.stream,
+                "logprobs": self.log_probs,
+                "options": {
+                    "seed": self.seed,
+                    "temperature": self.temperature,
+                    "num_predict": self.num_predict
+                }
+            }
+            req = requests.post(
+                "http://localhost:11434/api/chat",
+                json=payload,
+                timeout=120
+            )
+            req.raise_for_status()
+
+            data = req.json()
+            return data["message"]["content"]
+        else:
+            raise ValueError("Prompt must be a string or a list of messages.")
+
+
     def stop(self):
         requests.post(
         "http://localhost:11434/api/generate",

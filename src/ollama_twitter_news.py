@@ -36,7 +36,7 @@ def main():
 
     
     compl_gate_istr = cf["twitter_news"]["compliance_gate_instruction"]
-    sentiment_istr = cf["twitter_news"]["sentiment_instruction"]
+    sentiment_istr = cf["twitter_news"]["twitter_classification_instruction"]
 
     dm = DataModule("../ollama_config.yaml", "twitter_news")
     attack = PromptInjection(
@@ -46,7 +46,7 @@ def main():
     defence = InjectionDefence(
         defence_name=args.defence, 
         instruction=sentiment_istr, 
-        task='Twitter News',
+        task='Twitter News Topic Classification',
         model_name=args.model,
         seed=args.seed,
     )
@@ -65,7 +65,7 @@ def main():
         attacked_text = attack.inject(target_text=target_text)
         print(attacked_text)
         input()
-        final_prompt = defence.defence(attacked_text=attacked_text)
+        final_prompt = defence.defend(attacked_text=attacked_text)
         print(final_prompt)
         input()
         response = model.invoke(final_prompt)
