@@ -3,7 +3,6 @@ import re
 
 class Evaluator:
 
-    _COMP_RE = re.compile(r"^(allow|block)[\s\.\:\!]*$", re.IGNORECASE)
     
     def __init__(self, task):
         self.task = task
@@ -24,7 +23,14 @@ class Evaluator:
                 'predicted_compliance': None,
             }
         
-        
+        predicted_sentiment = self._parse_sentiment(response, strict=True)
+        has_sentiment = ~predicted_sentiment.isin([-1, -2])
+
+        predicted_compliance = self._parse_compliance(response, strict=True)
+        has_compliance = ~predicted_compliance.isin([-1, -2])
+
+        correct_sentiment = bool(has_sentiment and (predicted_sentiment == int(label)))
+
 def _parse_sentiment(self, response, strict=True):
     if strict:
         sent_re = re.compile(
@@ -59,12 +65,31 @@ def _parse_sentiment(self, response, strict=True):
 
 def _parse_compliance(self, response, strict=True):
     if strict:
-        for ln in response.splitlines():
-            ln = ln.strip()
-            if not ln:
-                continue
-        m = self._COMP_RE.fullmatch(ln)
-        if m:
-            return 1 if m.group(1).lower() == "allow" else 0
-    
+        comp_re = re.compile(
+            r"^(allow|block)[\s\.\:\!]*$",
+            re.IGNORECASE
+        )
 
+        matches = [
+            m.group(1).lower()
+            for ln in response.splitlines()
+            if (m := comp_re.fullmatch(ln.strip()))
+        ]
+
+    else:
+        comp_re = re.compile(
+            r"\b(allow|block)\b",
+            re.IGNORECASE
+        )
+
+        matches = [
+            m.lower()
+            for m in comp_re.findall(response)
+        ]
+
+    if not matches:
+        return -1
+    elif len(set(matches)) > 1:
+        return -2
+
+    return 1 if matches[0] == "allow" else 0
