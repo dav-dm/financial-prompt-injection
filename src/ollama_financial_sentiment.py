@@ -1,11 +1,10 @@
-import requests
-import pandas as pd
 from argparse import ArgumentParser
 
 from attack.attack_modules_prompt_injection import PromptInjection
-from defence.defence_modules_prompt_injection import Defences
-from util.config import load_config
+from defence.defence_modules_prompt_injection import InjectionDefence
 from data.data_module import DataModule
+from model.ollama_model import OllamaModel
+from util.config import load_config
 
 
 def main():
@@ -40,48 +39,40 @@ def main():
     sentiment_istr = cf["financial_sentiment"]["sentiment_instruction"]
 
     dm = DataModule("../ollama_config.yaml", "financial_sentiment")
-    attack = PromptInjection(attack_name = args.attack, injected_instruction=compl_gate_istr)
-    defence = Defences(defence_name=args.defence, instruction=sentiment_istr, task='Financial Sentiment Analysis')
+    attack = PromptInjection(
+        attack_name=args.attack, 
+        injected_instruction=compl_gate_istr
+    )
+    defence = InjectionDefence(
+        defence_name=args.defence, 
+        instruction=sentiment_istr, 
+        task='Financial Sentiment Analysis',
+        model_name=args.model,
+        seed=args.seed,
+    )
+    model = OllamaModel(
+        model_name=args.model,
+        seed=args.seed,
+        temperature=args.temperature,
+        log_probs=args.log_probs,
+        stream=args.stream,
+        num_predict=args.num_predict
+    )
+    
     for target_text, label in dm.iter_train():
         print(target_text, label)
         input()
         attacked_text = attack.inject(target_text=target_text)
         print(attacked_text)
         input()
-        final_prompt = defence.defence(attacked_text= attacked_text, seed= args.seed, model=args.model)
+        final_prompt = defence.defence(attacked_text=attacked_text)
         print(final_prompt)
         input()
-        payload = {
-            "model": args.model,
-            "prompt": final_prompt,
-            "stream": args.stream,
-            "logprobs": args.log_probs,
-            "options": {
-                "seed": args.seed,
-                "temperature": args.temperature,
-                "num_predict": args.num_predict
-            }
-        }
-        req = requests.post(
-            "http://localhost:11434/api/generate",
-            json=payload,
-            timeout=120
-        )
-        req.raise_for_status()
-
-        data = req.json()
-        response = repr(data.get("response", ""))
+        response = model.invoke(final_prompt)
         print(response)
         break
     # Stop the model after the test
-    requests.post(
-        "http://localhost:11434/api/generate",
-        json={
-            "model": args.model,
-            "keep_alive": 0
-        },
-        timeout=30
-    ).raise_for_status()
+    model.stop()
 
 if __name__ == "__main__":
     main()
