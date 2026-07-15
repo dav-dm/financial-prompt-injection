@@ -4,8 +4,9 @@ from attack.attack_modules_prompt_injection import PromptInjection
 from defence.defence_modules_prompt_injection import InjectionDefence
 from data.data_module import DataModule
 from model.ollama_model import OllamaModel
+from util import evaluator
 from util.config import load_config
-
+from util.evaluator import Evaluator
 
 def main():
     cf = load_config("../ollama_config.yaml")
@@ -58,7 +59,8 @@ def main():
         stream=args.stream,
         num_predict=args.num_predict
     )
-    
+    evaluator = Evaluator(task="financial_sentiment")
+
     for target_text, label in dm.iter_train():
         print(target_text, label)
         input()
@@ -70,7 +72,8 @@ def main():
         input()
         response = model.invoke(final_prompt)
         print(response)
-        # evaluator.evaluate(response=response, label=label, final_prompt=final_prompt)
+        result = evaluator.evaluate(response=response, label=label, final_prompt=final_prompt)
+        print(result["has_sentiment"], result["has_compliance"], result["predicted_sentiment"], result["predicted_compliance"])
         break
     # Stop the model after the test
     model.stop()
