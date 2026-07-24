@@ -31,6 +31,7 @@ class InjectionDefence:
                 num_predict=cf['model']['num_predict']
             )
 
+    # TODO: measure TOKEN(added_defense_words) for each defence method
     def _sandwich(self, attacked_text):
         return(
             f"{self.instruction}\n"

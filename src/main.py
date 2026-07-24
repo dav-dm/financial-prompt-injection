@@ -13,14 +13,18 @@ from util.config import load_config
 from util.seed import seed_everything
 from util.evaluator import Evaluator
 
-
+# TODO: measure ollama res consumption 
+# prompt_eval_count → numero di token del prompt in input
+# eval_count → numero di token generati in output
+# prompt_eval_duration e eval_duration → tempi (in nanosecondi) per elaborare prompt e generazione
 def main():
     cf = load_config("../ollama_config.yaml")
     parser = ArgumentParser(conflict_handler="resolve", add_help=True) 
     parser.add_argument(
         "--seed", type=int, default=cf["experiment"]["seed"], help='Seed for reproducibility')
     parser.add_argument(
-        "-t", "--task", type=str, default=cf["experiment"]["task"], help='Task to perform') # financial_sentiment, twitter_news 
+        "-t", "--task", type=str, default=cf["experiment"]["task"],
+        choices=["financial_sentiment", "twitter_news"], help='Task to perform')
     parser.add_argument(
         "-l", "--log_dir", type=str, default=cf["experiment"]["log_dir"],
         help='Path to save the output dataframe')
@@ -100,10 +104,12 @@ def main():
         else:
             final_prompt = target_text  # No attack or defence, just use the original text
 
+        # TODO: measure reply time
         response = model.invoke(final_prompt)
 
         result = evaluator.evaluate(response=response, label=label, final_prompt=final_prompt)
 
+        # TODO: measure TOKEN(added_defense_words)
         result["target_text"] = target_text
         df_res = pd.concat([df_res, pd.DataFrame([result])])
 
