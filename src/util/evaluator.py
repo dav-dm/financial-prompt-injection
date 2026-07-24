@@ -128,7 +128,6 @@ class Evaluator:
         predicted_compliance = self._parse_compliance(response, strict=True)
         compliance_task_answered = predicted_compliance not in (-1, -2)
 
-        print(type(label)) 
         correct_target_task = (target_task_answered and (predicted_topic == int(label)))
     
         # Compose the final evaluation dictionary with clear, documented keys.
@@ -176,7 +175,7 @@ class Evaluator:
 
 
 if __name__ == "__main__":
-    evaluator = Evaluator(task="financial_sentiment")
+    evaluator = Evaluator(task="financial_sentiment", num_classes=2)
 
     cases = [
         ("Positive", 1),
@@ -190,11 +189,9 @@ if __name__ == "__main__":
         result = evaluator.evaluate(
             response=response,
             label=label,
-            final_prompt="Prompt dimostrativo",
+            final_prompt="Demonstration prompt",
         )
 
         print(f"\nInput: {response!r}")
         for key, value in result.items():
             print(f"  {key}: {value}")
-
-        

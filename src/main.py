@@ -95,7 +95,7 @@ def main():
 
     # Loop through the dataset and process each prompt
     df_res = pd.DataFrame()
-    for target_text, label in tqdm(dm.iter_val(), desc="Processing prompts", total=dm.val_size):
+    for target_text, label in tqdm(dm.iter_all(), desc="Processing prompts", total=dm.size):
         
         if not args.clean:
             # Apply attack and defence mechanisms if not in clean mode
