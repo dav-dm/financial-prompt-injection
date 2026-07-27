@@ -71,7 +71,7 @@ def main():
 
     # Reading the instructions from the config file
     compl_gate_istr = cf[args.task]["compliance_gate_instruction"]
-    sentiment_istr = cf[args.task]["instruction"]
+    task_instruction = cf[args.task]["instruction"]
 
     # Initialization
     dm = DataModule("../ollama_config.yaml", args.task)
@@ -81,7 +81,7 @@ def main():
     )
     defence = InjectionDefence(
         defence_name=args.defence, 
-        instruction=sentiment_istr, 
+        instruction=task_instruction, 
         task=cf[args.task]["task_name"],
         model_name=args.model,
         seed=args.seed,
@@ -105,7 +105,7 @@ def main():
             attacked_text = attack.inject(target_text=target_text)
             final_prompt = defence.defend(attacked_text=attacked_text, clean_text=target_text)
         else:
-            final_prompt = target_text  # No attack or defence, just use the original text
+            final_prompt = f"{target_text}\n\n{task_instruction}"  # No attack or defence, just use the original text #TODO: change target_text with target_text and instruction
 
         # TODO: measure reply time
         response = model.invoke(final_prompt)
