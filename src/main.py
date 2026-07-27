@@ -29,6 +29,8 @@ def main():
         "-l", "--log_dir", type=str, default=cf["experiment"]["log_dir"],
         help='Path to save the output dataframe')
     parser.add_argument(
+    "--run-id", type=str, default=None, help="Unique identifier for the experiment run")
+    parser.add_argument(
         "-m", "--model", type=str, default=cf["model"]["name"], help='Model name to use')
     parser.add_argument(
         "--temperature", type=float, default=cf["model"]["temperature"], 
@@ -61,7 +63,8 @@ def main():
 
     # Create a unique log directory for this run based on the current timestamp.
     base_log_dir = Path(args.log_dir).resolve()
-    log_dir_ver = base_log_dir / f'{round(time.time())}'
+    run_id = args.run_id if args.run_id else f'run_{round(time.time())}'
+    log_dir_ver = base_log_dir / run_id
     log_dir_ver.mkdir(parents=True, exist_ok=True)
 
     seed_everything(args.seed, "../ollama_config.yaml")  # Set the random seed for reproducibility
