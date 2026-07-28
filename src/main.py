@@ -13,21 +13,21 @@ from util.config import load_config
 from util.seed import seed_everything
 from util.evaluator import Evaluator
 
-# TODO: measure ollama res consumption 
-# prompt_eval_count → numero di token del prompt in input
-# eval_count → numero di token generati in output
-# prompt_eval_duration e eval_duration → tempi (in nanosecondi) per elaborare prompt e generazione
+
 def main():
     cf = load_config("../ollama_config.yaml")
     parser = ArgumentParser(conflict_handler="resolve", add_help=True) 
     parser.add_argument(
-        "--seed", type=int, default=cf["experiment"]["seed"], help='Seed for reproducibility')
+        "-s", "--seed", type=int, default=cf["experiment"]["seed"], help='Seed for reproducibility')
     parser.add_argument(
         "-t", "--task", type=str, default=cf["experiment"]["task"],
         choices=["financial_sentiment", "twitter_news"], help='Task to perform')
     parser.add_argument(
         "-l", "--log_dir", type=str, default=cf["experiment"]["log_dir"],
         help='Path to save the output dataframe')
+    parser.add_argument(
+            "-m", "--mode", type=str, default=cf["experiment"]["mode"], choices=["c", "a", "ad"],
+            help='Execution mode: c (clean), a (attack only), ad (attack and defence)')
     parser.add_argument(
         "--run-id", type=str, default=None, help="Unique identifier for the experiment run")
     parser.add_argument(
@@ -44,9 +44,6 @@ def main():
     parser.add_argument(
         "--num-predict", type=int, default=cf["model"]["num_predict"],
         help='Number of tokens to predict')
-    parser.add_argument(
-        "-c", "--clean", action="store_true", default=False, 
-        help='Run the model without any attack or defence')
     parser.add_argument(
         "--attack", type=str, default=cf["attack"]
     )
@@ -100,20 +97,23 @@ def main():
     df_res = pd.DataFrame()
     for target_text, label in tqdm(dm.iter_all(), desc="Processing prompts", total=dm.size):
         
-        if not args.clean:
+        if args.mode == "ad":
             # Apply attack and defence mechanisms if not in clean mode
             attacked_text = attack.inject(target_text=target_text)
             final_prompt = defence.defend(attacked_text=attacked_text, clean_text=target_text)
+        elif args.mode == "a":
+            # Apply only the attack mechanism if in attack-only mode
+            final_prompt = attack.inject(target_text=target_text)
         else:
-            final_prompt = f"{target_text}\n\n{task_instruction}"  # No attack or defence, just use the original text #TODO: change target_text with target_text and instruction
-
-        # TODO: measure reply time
-        response = model.invoke(final_prompt)
-
+            # No attack or defence, just use the original text
+            final_prompt = f"{target_text}\n\n{task_instruction}"
+        response, metadata = model.invoke(final_prompt, return_metadata=True)
         result = evaluator.evaluate(response=response, label=label, final_prompt=final_prompt)
 
-        # TODO: measure TOKEN(added_defense_words)
         result["target_text"] = target_text
+        result["prompt_eval_count"] = metadata.get("prompt_eval_count", None)  # Number of input tokens in the prompt
+        result["eval_count"] = metadata.get("eval_count", None)  # Number of output tokens generated in the response
+        result["total_duration"] = metadata.get("total_duration", None)  # Time spent generating the response in nanoseconds
         df_res = pd.concat([df_res, pd.DataFrame([result])])
 
     # Stop the model after the test

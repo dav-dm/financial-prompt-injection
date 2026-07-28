@@ -11,7 +11,7 @@ class OllamaModel:
         self.num_predict = num_predict
 
 
-    def invoke(self, prompt):
+    def invoke(self, prompt, return_metadata=False):
         if isinstance(prompt, str):
             payload = {
                 "model": self.model_name,
@@ -32,6 +32,8 @@ class OllamaModel:
             req.raise_for_status()
 
             data = req.json()
+            if return_metadata:
+                return data.get("response", ""), data
             return data.get("response", "")
         
         elif isinstance(prompt, list):
@@ -54,6 +56,8 @@ class OllamaModel:
             req.raise_for_status()
 
             data = req.json()
+            if return_metadata:
+                return data["message"]["content"], data
             return data["message"]["content"]
         else:
             raise ValueError("Prompt must be a string or a list of messages.")

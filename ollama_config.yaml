@@ -3,13 +3,14 @@ experiment:
   seed: 0
   task: 'financial_sentiment'
   log_dir: '../results'
+  mode: 'c'
   
 model:
   name: 'qwen3:0.6b'
   temperature: 1
   logprobs: True
   stream: False
-  num_predict: 128
+  num_predict: 2048
 
 attack: 'naive'
 defence: 'sandwich'
