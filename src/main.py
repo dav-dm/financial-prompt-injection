@@ -29,7 +29,7 @@ def main():
         "-l", "--log_dir", type=str, default=cf["experiment"]["log_dir"],
         help='Path to save the output dataframe')
     parser.add_argument(
-    "--run-id", type=str, default=None, help="Unique identifier for the experiment run")
+        "--run-id", type=str, default=None, help="Unique identifier for the experiment run")
     parser.add_argument(
         "-m", "--model", type=str, default=cf["model"]["name"], help='Model name to use')
     parser.add_argument(

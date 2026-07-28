@@ -12,6 +12,7 @@ do
     for TASK in $TASKS
     do
         RUN_ID=$(date +"%Y-%m-%d_%H-%M-%S")
+        RUN_ID="${RUN_ID}_${MODEL}_${TASK}"
         RUN_DIR="$RESULTS_DIR/$RUN_ID"
 
         mkdir -p "$RUN_DIR"
