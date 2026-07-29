@@ -99,11 +99,11 @@ def main():
         
         if args.mode == "ad":
             # Apply attack and defence mechanisms if not in clean mode
-            attacked_text = attack.inject(target_text=target_text)
+            attacked_text = attack.inject(target_text=f"{target_text}\n\n{task_instruction}")
             final_prompt = defence.defend(attacked_text=attacked_text, clean_text=target_text)
         elif args.mode == "a":
             # Apply only the attack mechanism if in attack-only mode
-            final_prompt = attack.inject(target_text=target_text)
+            final_prompt = attack.inject(target_text=f"{task_instruction}\n\n{target_text}")
         else:
             # No attack or defence, just use the original text
             final_prompt = f"{target_text}\n\n{task_instruction}"
