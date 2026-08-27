@@ -273,5 +273,5 @@ pyrightconfig.json
 TwitterFinancialNews.ipynb
 FinancialSentimentAnalysis.ipynb
 batch_experiments.sh
-
+test_metrics.ipynb
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,windows,macos,linux
