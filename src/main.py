@@ -26,7 +26,7 @@ def main():
         "-l", "--log_dir", type=str, default=cf["experiment"]["log_dir"],
         help='Path to save the output dataframe')
     parser.add_argument(
-            "-m", "--mode", type=str, default=cf["experiment"]["mode"], choices=["c", "a", "ad"],
+            "--mode", type=str, default=cf["experiment"]["mode"], choices=["c", "a", "ad"],
             help='Execution mode: c (clean), a (attack only), ad (attack and defence)')
     parser.add_argument(
         "--run-id", type=str, default=None, help="Unique identifier for the experiment run")
