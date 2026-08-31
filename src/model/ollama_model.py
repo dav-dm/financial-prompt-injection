@@ -1,14 +1,18 @@
+import time
 import requests
 
 
 class OllamaModel:
-    def __init__(self, model_name, seed, temperature, log_probs, stream, num_predict):
+    def __init__(self, model_name, seed, temperature, log_probs, stream, num_predict,
+                 max_retries=2, retry_delay=2):
         self.model_name = model_name
         self.seed = seed
         self.temperature = temperature
         self.log_probs = log_probs
         self.stream = stream
         self.num_predict = num_predict
+        self.max_retries = max_retries
+        self.retry_delay = retry_delay
 
 
     def invoke(self, prompt, return_metadata=False):
@@ -24,12 +28,22 @@ class OllamaModel:
                     "num_predict": self.num_predict
                 }
             }
-            req = requests.post(
-                "http://localhost:11434/api/generate",
-                json=payload,
-                timeout=120
-            )
-            req.raise_for_status()
+            url = "http://localhost:11434/api/generate"
+
+            for attempt in range(1, self.max_retries + 2):
+                req = requests.post(url, json=payload, timeout=120)
+                try:
+                    req.raise_for_status()
+                    break
+                except requests.exceptions.HTTPError as e:
+                    print(
+                        f"[OllamaModel] HTTP error {req.status_code} on /api/generate "
+                        f"(model={self.model_name}, attempt {attempt}/{self.max_retries + 1})\n"
+                        f"Response body: {req.text[:2000]}"
+                    )
+                    if attempt > self.max_retries:
+                        raise
+                    time.sleep(self.retry_delay)
 
             data = req.json()
             if return_metadata:
@@ -48,12 +62,22 @@ class OllamaModel:
                     "num_predict": self.num_predict
                 }
             }
-            req = requests.post(
-                "http://localhost:11434/api/chat",
-                json=payload,
-                timeout=120
-            )
-            req.raise_for_status()
+            url = "http://localhost:11434/api/chat"
+
+            for attempt in range(1, self.max_retries + 2):
+                req = requests.post(url, json=payload, timeout=120)
+                try:
+                    req.raise_for_status()
+                    break
+                except requests.exceptions.HTTPError as e:
+                    print(
+                        f"[OllamaModel] HTTP error {req.status_code} on /api/chat "
+                        f"(model={self.model_name}, attempt {attempt}/{self.max_retries + 1})\n"
+                        f"Response body: {req.text[:2000]}"
+                    )
+                    if attempt > self.max_retries:
+                        raise
+                    time.sleep(self.retry_delay)
 
             data = req.json()
             if return_metadata:

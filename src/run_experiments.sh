@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -euo pipefail
+# Uncomment if you want the script to exit immediately if any command fails
+# set -euo pipefail
 
 RESULTS_DIR="../results"
 
