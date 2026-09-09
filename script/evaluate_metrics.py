@@ -24,15 +24,17 @@ def compute_scores(df, task, row, path):
     missing_idx = df[df[pred_col].isna()].index
     for idx in missing_idx:
         print(f"[WARNING] Found missing prediction at index {idx} - path: {path}")
-    df.loc[missing_idx, pred_col] = -1
+    df.loc[missing_idx, pred_col] = -99
 
     preds = df[pred_col].values
     labels = df['label'].values
 
+    class_labels = sorted(df['label'].unique())
+
     row['accuracy'] = accuracy_score(labels, preds)
-    row['precision_macro'] = precision_score(labels, preds, average='macro', zero_division=0)
-    row['recall_macro'] = recall_score(labels, preds, average='macro', zero_division=0)
-    row['f1_macro'] = f1_score(labels, preds, average='macro', zero_division=0)
+    row['precision_macro'] = precision_score(labels, preds, labels=class_labels, average='macro', zero_division=0)
+    row['recall_macro'] = recall_score(labels, preds, labels=class_labels, average='macro', zero_division=0)
+    row['f1_macro'] = f1_score(labels, preds, labels=class_labels, average='macro', zero_division=0)
     row['precision_micro'] = precision_score(labels, preds, average='micro', zero_division=0)
     row['recall_micro'] = recall_score(labels, preds, average='micro', zero_division=0)
     row['f1_micro'] = f1_score(labels, preds, average='micro', zero_division=0)
