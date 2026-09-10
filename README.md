@@ -1,4 +1,17 @@
-# Financial Prompt Injection
+# COIN: finanCial prOmpt INjection benchmark for LLMS
+
+<div align="center">
+<pre>
+  /$$$$$$   /$$$$$$  /$$$$$$ /$$   /$$
+ /$$__  $$ /$$__  $$|_  $$_/| $$$ | $$
+| $$  \__/| $$  \ $$  | $$  | $$$$| $$
+| $$      | $$  | $$  | $$  | $$ $$ $$
+| $$      | $$  | $$  | $$  | $$  $$$$
+| $$    $$| $$  | $$  | $$  | $$\  $$$
+|  $$$$$$/|  $$$$$$/ /$$$$$$| $$ \  $$
+ \______/  \______/ |______/|__/  \__/
+</pre>
+</div>                                                                      
 
 This repository is an experiment framework for measuring how prompt-injection attacks affect language models on financial text-classification tasks, and how simple prompt-level defences change those results. It sends prompts to a local Ollama server, evaluates the model output with strict parsers, and stores per-example responses and metadata as CSV files.
 
